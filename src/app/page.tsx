@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -15,7 +16,7 @@ export default function Home() {
               <br /> No final, você verá sua pontuação!
             </p>
           </div>
-          <Link className="block" href={"/quiz"}>
+          <Link className="block w-max" href={"/quiz"}>
             <Button>Iniciar Quiz!</Button>
           </Link>
         </div>

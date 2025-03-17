@@ -13,7 +13,7 @@ import { ArrowRight } from "lucide-react";
 interface QuizCardProps {
   currentQuestion: number;
   setAnswerSelected: (answer: string) => void;
-  quizSelectedQuestion: QuizProps;
+  quizSelectedQuestion: QuizProps | undefined;
   answerSelected: string | null;
   nextQuestion: () => void;
   isLastQuestion: boolean;
@@ -35,12 +35,12 @@ export default function QuizCard({
     <Card>
       <CardHeader>
         <CardTitle>
-          {currentQuestion + 1}. {quizSelectedQuestion.question}
+          {currentQuestion + 1}. {quizSelectedQuestion?.question}
         </CardTitle>
-        <CardDescription>{quizSelectedQuestion.description}</CardDescription>
+        <CardDescription>{quizSelectedQuestion?.description}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
-        {quizSelectedQuestion.answers.map((answer, index) => (
+        {quizSelectedQuestion?.answers.map((answer, index) => (
           <Button
             onClick={() => setAnswerSelected(answer.answer)}
             key={index}

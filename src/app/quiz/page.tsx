@@ -11,31 +11,38 @@ import {
 } from "@/components/ui/card";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useState } from "react";
-import { QUIZ_MOCK } from "../helpers/quiz";
 import { UserAnswersProps } from "../types/quiz.types";
 import QuizCard from "./components/quiz-card";
 import Link from "next/link";
+import { useFetchQuiz } from "../hook/fetch-women";
+import { PageTransition } from "@/components/common/page-transition";
 
 export default function Quiz() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answerSelected, setAnswerSelected] = useState<null | string>(null);
   const [userAnswers, setUserAnswers] = useState<UserAnswersProps[]>([]);
-  const quizSelectedQuestion = QUIZ_MOCK[currentQuestion];
-  const isLastQuestion = currentQuestion === QUIZ_MOCK.length - 1;
-  const disabledNextButton = answerSelected === null;
   const [quizFinished, setQuizFinished] = useState(false);
+
+  const { data: quizData, isLoading, isError } = useFetchQuiz();
+
+  if (isLoading) return <PageTransition />;
+  if (isError) return <div>Erro ao buscar os dados</div>;
+
+  const quizSelectedQuestion = quizData?.[currentQuestion];
+  const isLastQuestion = currentQuestion === (quizData?.length ?? 0) - 1;
+  const disabledNextButton = answerSelected === null;
 
   const nextQuestion = () => {
     if (answerSelected === null) return;
 
-    const isCorrect = quizSelectedQuestion.answers.find(
+    const isCorrect = quizSelectedQuestion?.answers.find(
       (a) => a.answer === answerSelected
     )?.isCorrect;
 
     setUserAnswers((prev) => [
       ...prev,
       {
-        question: quizSelectedQuestion.question,
+        question: quizSelectedQuestion?.question,
         selected: answerSelected,
         correct: !!isCorrect,
       },
@@ -60,8 +67,14 @@ export default function Quiz() {
           disabledNextButton={disabledNextButton}
           isLastQuestion={isLastQuestion}
           nextQuestion={nextQuestion}
-          quiz={QUIZ_MOCK}
-          quizSelectedQuestion={quizSelectedQuestion}
+          quiz={quizData ?? []}
+          quizSelectedQuestion={
+            quizSelectedQuestion || {
+              question: "Carregando...",
+              description: "",
+              answers: [],
+            }
+          }
           setAnswerSelected={setAnswerSelected}
         />
       )}
@@ -75,7 +88,7 @@ export default function Quiz() {
               <span className="font-bold">
                 {userAnswers.filter((a) => a.correct).length}
               </span>{" "}
-              de <span className="font-bold">{QUIZ_MOCK.length} </span>{" "}
+              de <span className="font-bold">{quizData?.length} </span>{" "}
               perguntas.
             </CardDescription>
           </CardHeader>
